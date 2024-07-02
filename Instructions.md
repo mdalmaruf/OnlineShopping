@@ -43,8 +43,8 @@
 
 1. In `OnlineShopping.py`, add the following code:
 
-    ```python
-    from flask import Flask, request, render_template, redirect, url_for
+```python
+from flask import Flask, request, render_template, redirect, url_for
 import os
 
 app = Flask(__name__)
@@ -99,7 +99,7 @@ def add():
 if __name__ == '__main__':
     app.run(debug=True)
 
-    ```
+ ```
 
 ### Create Templates Folder
 
@@ -110,8 +110,8 @@ if __name__ == '__main__':
 
 1. Inside `templates`, create `index.html` with the following content:
 
-    ```html
-    <!DOCTYPE html>
+```html
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -150,14 +150,14 @@ if __name__ == '__main__':
   </body>
 </html>
 
-    ```
+```
 
 ## Create add.html
 
 1. Inside `templates`, create `add.html` with the following content:
 
-    ```html
-   <!DOCTYPE html>
+```html
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -197,7 +197,7 @@ if __name__ == '__main__':
   </body>
 </html>
 
-    ```
+ ```
 
 ## Add CSS for Better UI
 
@@ -206,7 +206,7 @@ if __name__ == '__main__':
 1. In the project directory, create a folder named `static`.
 2. Inside `static`, create a file named `styles.css` with the following content:
 
-    ```css
+```css
     body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -318,7 +318,7 @@ footer {
     bottom: 0;
 }
 
-    ```
+```
 
 ## Add Products to Text File
 
@@ -327,11 +327,11 @@ footer {
 1. In the project directory, create a file named `products.txt`.
 2. Add product details in the following format:
 
-    ```plaintext
-   1,Product A,10.99,Type 1,https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f
+```plaintext
+1,Product A,10.99,Type 1,https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f
 2,Product B,15.49,Type 2,https://images.unsplash.com/photo-1567306226416-28f0efdc88ce
 3,Product C,8.99,Type 3,https://loremflickr.com/cache/resized/65535_51774384039_624f926674_q_150_150_nofilter.jpg
-    ```
+```
 
 ## Run the Application
 
