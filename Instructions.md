@@ -44,47 +44,61 @@
 1. In `OnlineShopping.py`, add the following code:
 
     ```python
-    from flask import Flask, render_template, request, redirect, url_for
-    import os
+    from flask import Flask, request, render_template, redirect, url_for
+import os
 
-    app = Flask(__name__)
+app = Flask(__name__)
 
-    # Function to read products from a text file
-    def read_products():
-        products = []
-        if os.path.exists('products.txt'):
-            with open('products.txt', 'r') as file:
-                for line in file:
-                    parts = line.strip().split(',')
-                    products.append({
+# Load products from file
+def load_products():
+    products = []
+    # Check if the file exists before trying to read it
+    if os.path.exists('products.txt'):
+        with open('products.txt', 'r') as file:
+            for line in file:
+                parts = line.strip().split(',')
+                if len(parts) == 5:
+                    product = {
                         'id': parts[0],
                         'name': parts[1],
                         'price': parts[2],
                         'type': parts[3],
                         'image': parts[4]
-                    })
-        return products
+                    }
+                    products.append(product)
+    return products
 
-    @app.route('/')
-    def index():
-        products = read_products()
-        return render_template('index.html', products=products)
+# Save a new product to the file
+def save_product(product):
+    # Append a new product to the file with a newline
+    with open('products.txt', 'a') as file:
+        if os.path.getsize('products.txt') > 0:
+            file.write("\n")
+        file.write(f"{product['id']},{product['name']},{product['price']},{product['type']},{product['image']}")
 
-    @app.route('/add', methods=['GET', 'POST'])
-    def add():
-        if request.method == 'POST':
-            id = request.form['id']
-            name = request.form['name']
-            price = request.form['price']
-            type = request.form['type']
-            image = request.form['image']
-            with open('products.txt', 'a') as file:
-                file.write(f"{id},{name},{price},{type},{image}\n")
-            return redirect(url_for('index'))
-        return render_template('add.html')
+        
+@app.route('/')
+def index():
+    products = load_products()
+    return render_template('index.html', products=products)
 
-    if __name__ == '__main__':
-        app.run(debug=True)
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        new_product = {
+            'id': request.form['id'],
+            'name': request.form['name'],
+            'price': request.form['price'],
+            'type': request.form['type'],
+            'image': request.form['image']
+        }
+        save_product(new_product)
+        return redirect(url_for('index'))
+    return render_template('add.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
     ```
 
 ### Create Templates Folder
@@ -98,27 +112,44 @@
 
     ```html
     <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Online Shopping</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    </head>
-    <body>
-        <h1>Products</h1>
-        <div class="product-list">
-            {% for product in products %}
-            <div class="product">
-                <img src="{{ product.image }}" alt="{{ product.name }}">
-                <h2>{{ product.name }}</h2>
-                <p>Price: {{ product.price }}</p>
-                <p>Type: {{ product.type }}</p>
-            </div>
-            {% endfor %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Online Shopping</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>Online Shopping</h1>
+        <a href="{{ url_for('add') }}" class="add-product-button"
+          >Add New Product</a
+        >
+      </div>
+    </header>
+    <main>
+      <div class="product-list">
+        {% for product in products %}
+        <div class="product">
+          <img src="{{ product.image }}" alt="{{ product.name }}" />
+          <div class="product-info">
+            <h2>{{ product.name }}</h2>
+            <p class="price">Price: ${{ product.price }}</p>
+            <p class="type">Type: {{ product.type }}</p>
+          </div>
         </div>
-        <a href="{{ url_for('add') }}">Add a new product</a>
-    </body>
-    </html>
+        {% endfor %}
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2024 Online Shopping. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
+
     ```
 
 ## Create add.html
@@ -126,31 +157,46 @@
 1. Inside `templates`, create `add.html` with the following content:
 
     ```html
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Add Product</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    </head>
-    <body>
+   <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add Product</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
         <h1>Add a New Product</h1>
-        <form action="{{ url_for('add') }}" method="post">
-            <label for="id">ID:</label>
-            <input type="text" id="id" name="id" required><br>
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required><br>
-            <label for="price">Price:</label>
-            <input type="text" id="price" name="price" required><br>
-            <label for="type">Type:</label>
-            <input type="text" id="type" name="type" required><br>
-            <label for="image">Image URL:</label>
-            <input type="text" id="image" name="image" required><br>
-            <input type="submit" value="Add Product">
-        </form>
-        <a href="{{ url_for('index') }}">Back to Products</a>
-    </body>
-    </html>
+        <a href="{{ url_for('index') }}" class="back-button"
+          >Back to Products</a
+        >
+      </div>
+    </header>
+    <main>
+      <form action="{{ url_for('add') }}" method="post">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required /><br />
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required /><br />
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" required /><br />
+        <label for="type">Type:</label>
+        <input type="text" id="type" name="type" required /><br />
+        <label for="image">Image URL:</label>
+        <input type="text" id="image" name="image" required /><br />
+        <input type="submit" value="Add Product" />
+      </form>
+    </main>
+    <footer>
+      <p>&copy; 2024 Online Shopping. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
+
     ```
 
 ## Add CSS for Better UI
@@ -162,46 +208,116 @@
 
     ```css
     body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-    }
-    h1 {
-        text-align: center;
-        margin-top: 20px;
-    }
-    .product-list {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 20px;
-    }
-    .product {
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin: 10px;
-        padding: 20px;
-        width: 200px;
-        text-align: center;
-    }
-    .product img {
-        max-width: 100%;
-        height: auto;
-    }
-    .product h2 {
-        font-size: 1.2em;
-    }
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    form label, form input {
-        margin: 5px;
-    }
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #343a40;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.add-product-button, .back-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.add-product-button:hover, .back-button:hover {
+    background-color: #0056b3;
+}
+
+main {
+    padding: 20px;
+}
+
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.product {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 220px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.product:hover {
+    transform: scale(1.05);
+}
+
+.product img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 10px;
+}
+
+.product h2 {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.price {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.type {
+    color: #6c757d;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form label, form input {
+    margin: 5px;
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
     ```
 
 ## Add Products to Text File
@@ -212,9 +328,9 @@
 2. Add product details in the following format:
 
     ```plaintext
-    1,Product A,10.99,Type 1,https://via.placeholder.com/150
-    2,Product B,15.49,Type 2,https://via.placeholder.com/150
-    3,Product C,8.99,Type 3,https://via.placeholder.com/150
+   1,Product A,10.99,Type 1,https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f
+2,Product B,15.49,Type 2,https://images.unsplash.com/photo-1567306226416-28f0efdc88ce
+3,Product C,8.99,Type 3,https://loremflickr.com/cache/resized/65535_51774384039_624f926674_q_150_150_nofilter.jpg
     ```
 
 ## Run the Application
