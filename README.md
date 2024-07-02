@@ -1,5 +1,5 @@
 
-# Online Shopping Application using Flask Project + Cloud Deployment Demo
+# Web Application using Flask Project + Cloud Deployment Demo
 ![OnlineShopping](/App.JPG)
 
 ## Open Visual Studio and select Create a new project
