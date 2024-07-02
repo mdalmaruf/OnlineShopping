@@ -1,4 +1,5 @@
-# Create Flask Project
+# Create a Online Shopping using Flask Project
+![OnlineShopping](/app.JPG)
 
 ## Open Visual Studio and select Create a new project
 
