@@ -117,4 +117,115 @@ This repository contains a Flask application for online shopping with product de
 1. In the project directory, create a folder named `templates`.
 2. Inside `templates`, create two files: `index.html` and `add.html`.
 
-You are now ready to start your Flask application by running `OnlineShopping.py`.
+## Create index.html
+
+1. Inside `templates`, create `index.html` with the following content:
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Online Shopping</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <h1>Products</h1>
+        <div class="product-list">
+            {% for product in products %}
+            <div class="product">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+                <h2>{{ product.name }}</h2>
+                <p>Price: {{ product.price }}</p>
+                <p>Type: {{ product.type }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('add') }}">Add a new product</a>
+    </body>
+    </html>
+    ```
+
+## Create add.html
+
+1. Inside `templates`, create `add.html` with the following content:
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Add Product</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <h1>Add a New Product</h1>
+        <form action="{{ url_for('add') }}" method="post">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" required><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" required><br>
+            <label for="type">Type:</label>
+            <input type="text" id="type" name="type" required><br>
+            <label for="image">Image URL:</label>
+            <input type="text" id="image" name="image" required><br>
+            <input type="submit" value="Add Product">
+        </form>
+        <a href="{{ url_for('index') }}">Back to Products</a>
+    </body>
+    </html>
+    ```
+
+## Add CSS for Better UI
+
+### Create Static Folder
+
+1. In the project directory, create a folder named `static`.
+2. Inside `static`, create a file named `styles.css` with the following content:
+
+    ```css
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .product-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 20px;
+    }
+    .product {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin: 10px;
+        padding: 20px;
+        width: 200px;
+        text-align: center;
+    }
+    .product img {
+        max-width: 100%;
+        height: auto;
+    }
+    .product h2 {
+        font-size: 1.2em;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    form label, form input {
+        margin: 5px;
+    }
+    ```
+
